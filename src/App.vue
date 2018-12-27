@@ -6,13 +6,13 @@
       <input type="button" class="button button-pause" value="Pause Game" v-if="isPlaying && !gameOver" v-on:click="isPlaying = false">
     </div>
     <div class="container game-container">
-      <Board v-on:user-scores="updateScore" v-on:game-over="onGameOver" v-bind:is-playing="isPlaying || gameOver" />
+      <Board v-on:user-scores="updateScore" ref="board" v-on:game-over="onGameOver" v-bind:is-playing="isPlaying || gameOver" />
       <div class="information" v-if="isPlaying">
         Score: {{ score }}
       </div>
       <div class="game-over-wrapper" v-if="gameOver">
         <h2 class="game-over">Game Over</h2>
-        <input type="button" class="button button-restart" value="Restart Game" v-if="gameOver" v-on:click="isPlaying = true; gameOver = false;">
+        <input type="button" class="button button-restart" value="Restart Game" v-if="gameOver" v-on:click="restartGame">
       </div>
     </div>
   </div>
@@ -36,6 +36,15 @@ export default {
   methods: {
     onGameOver: function () {
       this.gameOver = true;
+    },
+    restartGame: function () {
+      this.$refs.board.resetGameState();
+
+      this.isPlaying = true;
+      this.gameOver = false;
+      this.score = 0;
+
+      this.$refs.board.startGame();
     },
     updateScore: function (additionalScore) {
       this.score = this.score + additionalScore;

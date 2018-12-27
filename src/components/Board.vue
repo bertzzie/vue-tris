@@ -20,22 +20,24 @@
   import PieceInfo from "./constants/PieceInfo";
   import ArrayLibs from './lib/ArrayLibs';
 
+  const INITIAL_STATE = {
+    blocks: [],
+    currentPiece: {
+      canvasContext: undefined,
+      position: { x: 3, y: 0 },
+      rotation: 0,
+      shape: PieceInfo.randomShapes()
+    },
+    gameTickTimeoutID: 0
+  };
+
   export default {
     name: "Board",
     components: {
       Piece
     },
     data: function () {
-      return {
-        blocks: [],
-        currentPiece: {
-          canvasContext: undefined,
-          position: { x: 3, y: 0 },
-          rotation: 0,
-          shape: PieceInfo.randomShapes()
-        },
-        gameTickTimeoutID: 0
-      };
+      return INITIAL_STATE;
     },
     props: {
       dropInterval: {
@@ -66,6 +68,10 @@
       }
     },
     methods: {
+      resetGameState: function () {
+        this.blocks = [];
+        this.currentPiece = Object.assign({}, this.currentPiece, INITIAL_STATE.currentPiece);
+      },
       resetBoard: function () {
         this.clearBoard();
         this.drawBoard();
