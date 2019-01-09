@@ -63,6 +63,9 @@
       getShapePath: function (shape, position) {
         const currentGrid = PieceInfo.shapes[shape].grid;
         let shapeGrid = this.shapeGrid;
+
+        // !ArrayLibs.equals(currentGrid, this.shapeGrid) is to check if it's been rotated or not
+        // this.position.x === 3 && this.position.y === 0 is to detect initial placement
         if (!ArrayLibs.equals(currentGrid, this.shapeGrid) &&
             this.position.x === 3 && this.position.y === 0) {
           shapeGrid = currentGrid;
@@ -85,6 +88,13 @@
         return piece;
       },
       rotateShapeGrid: function () {
+        // Create empty array with the shape of this.shapeGrid
+        // this is done so we don't have to mutate this.shapeGrid directly, in case something went wrong
+        //
+        // P.S. new Array(this.shapeGrid[0].length).fill(this.shapeGrid.length, 0) won't work.
+        //      Why? Try to answer before you open the linked answer below.
+        //
+        // Answer: https://stackoverflow.com/questions/38940576/javascript-why-array-prototype-fill-actually-fills-a-pointer-of-object-when
         let temp = Array.from({length: this.shapeGrid[0].length}, () => new Array(this.shapeGrid.length).fill(0));
 
         for (let row = 0; row < this.shapeGrid.length; row++) {

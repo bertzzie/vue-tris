@@ -70,13 +70,19 @@
     methods: {
       resetGameState: function () {
         this.blocks = [];
-        this.currentPiece = Object.assign({}, this.currentPiece, INITIAL_STATE.currentPiece);
+        // It's better to not do Object.assign({}, this.currentPiece, INITIAL_STATE.currentPiece) here. Why?
+        this.currentPiece = Object.assign({}, this.currentPiece, {
+          position: { x: 3, y: 0 },
+          rotation: 0,
+          shape: PieceInfo.randomShapes()
+        });
       },
       resetBoard: function () {
         this.clearBoard();
         this.drawBoard();
       },
       resetCurrentPiece() {
+        // we can't do Object.assign({}, this.currentPiece, INITIAL_STATE.currentPiece) here. Why?
         this.currentPiece = Object.assign({}, this.currentPiece, {
           position: { x: 3, y: 0 },
           rotation: 0,
@@ -117,9 +123,7 @@
           return;
         }
 
-        this.currentPiece.position = Object.assign({}, this.currentPiece.position, {
-          y: this.currentPiece.position.y + 1
-        });
+        this.currentPieceMoveDown();
       },
       clearLines: function () {
         const groupedBlocks = ArrayLibs.groupBy(this.blocks, pos => pos.y);
@@ -180,6 +184,11 @@
 
         context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       },
+      currentPieceMoveDown: function () {
+        this.currentPiece.position = Object.assign({}, this.currentPiece.position, {
+          y: this.currentPiece.position.y + 1
+        });
+      },
       currentPieceMoveLeft: function () {
         if (this.leftMostShapePosition() === 0 || this.isNextTickCollides(v => ({ x: v.x - 1, y: v.y }))) {
           return ;
@@ -204,10 +213,9 @@
       },
       currentPieceRotate: function () {
         this.resetBoard();
-        this.currentPiece.rotation = (this.currentPiece.rotation + 90) % 360;
+        this.currentPiece.rotation = (this.currentPiece.rotation + 90) % 360; // % 360 so we can never have more than 360
       },
-      drawBlocks: function (context) {
-        const gridSize = this.size.grid;
+      drawBlocks: function (context, gridSize) {
         let blockShapes = new Path2D();
 
         for (let i = 0; i < this.blocks.length; i++) {
@@ -223,7 +231,7 @@
         context.fill(blockShapes);
       },
       drawBoardGrid: function (context, gridSize) {
-        context.beginPath();
+        context.beginPath(); // to reset drawing context
         for (let i = 0; i <= this.size.width; i ++) {
           context.moveTo(i * gridSize, 0);
           context.lineTo(i * gridSize, this.size.height * gridSize);
@@ -245,7 +253,7 @@
         }
 
         this.drawBoardGrid(context, this.size.grid);
-        this.drawBlocks(context);
+        this.drawBlocks(context, this.size.grid);
 
         return context;
       },
